@@ -1,13 +1,12 @@
 from fastapi import FastAPI
 
+from entities import User, UserCreate
+
 app = FastAPI()
 
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+@app.post(
+    "/api/create_user",
+    response_model=User
+)
+async def create_user(user: UserCreate):
