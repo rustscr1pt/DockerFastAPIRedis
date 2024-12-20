@@ -9,7 +9,7 @@ services:
       - "8000:8000"
     depends_on:
       - db
-      - user-management
+      - fastapi
     networks:
       - combined-network
 
@@ -26,14 +26,12 @@ services:
     networks:
       - combined-network
 
-  FastAPI:
-    build: ./FastAPI
-    command: sh -c "npm run test || true && npm run start"
-    container_name: FastAPI
+  fastapi:
+    build: ./fastapi
+    command: uvicorn main:app --host 0.0.0.0 --port 8001
+    container_name: fastapi
     depends_on:
       - db
-    environment:
-      PORT: 8001
     networks:
       - combined-network
 

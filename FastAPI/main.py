@@ -1,8 +1,9 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from alchemy_models import SessionLocal
-from entities import User, UserCreate
+from entities import StandardResponse
+from alchemy_models import SessionLocal, User
+from entities import UserCreate
 
 def get_db():
     db = SessionLocal()
@@ -23,18 +24,18 @@ async def create_user(data: UserCreate, db: Session = Depends(get_db)):
         db.add(db_user)
         db.commit()
         db.refresh(db_user)
-        return {"data" : db_user}
+        return db_user
     except Exception as e:
-        return {"error" : str(e)}
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get(
     "/api/get_users",
-    response_model=list[User]
+    response_model=StandardResponse
 )
 async def get_users(db: Session = Depends(get_db)):
     try:
         users = db.query(User).all()
-        return {"data" : users}
+        return StandardResponse(response=users)
     except Exception as e:
-        return {"error" : str(e)}
+        raise HTTPException(status_code=500, detail=str(e))
