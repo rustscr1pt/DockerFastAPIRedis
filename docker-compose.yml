@@ -1,0 +1,42 @@
+version: "3.4"
+services:
+
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - user-management
+    networks:
+      - combined-network
+
+  db:
+    image: mysql:8
+    container_name: db
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_USER: myuser
+      MYSQL_PASSWORD: mypassword
+      MYSQL_DATABASE: user_management
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    networks:
+      - combined-network
+
+  FastAPI:
+    build: ./FastAPI
+    command: sh -c "npm run test || true && npm run start"
+    container_name: FastAPI
+    depends_on:
+      - db
+    environment:
+      PORT: 8001
+    networks:
+      - combined-network
+
+networks:
+  combined-network:
+    driver: bridge
