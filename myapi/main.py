@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from alchemy_models import initialize_database, create_tables
-from user_routes import router
+from routes import router
 
 initialize_database()
 create_tables()
