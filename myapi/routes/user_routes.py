@@ -1,9 +1,13 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from alchemy_models import get_db, User
 from entities import UserCreate, UserResponse
 from redis_manager import redis_client
+
+logging.basicConfig(level=logging.INFO)
 
 router = APIRouter()
 
@@ -48,3 +52,13 @@ async def get_users(db: Session = Depends(get_db)):
             return [UserResponse.parse_raw(user) for user in cached_users]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/check_cache")
+async def check_cache():
+    try:
+        keys = redis_client.keys("*")  # Get all keys in Redis
+        logging.info(f"Redis Keys: {keys}")
+        return {"keys": keys}
+    except Exception as e:
+        logging.error(f"Error checking Redis: {e}")
+        raise HTTPException(status_code=500, detail="Error checking Redis")
