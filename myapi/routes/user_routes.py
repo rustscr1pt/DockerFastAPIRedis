@@ -24,7 +24,7 @@ async def create_user(data: UserCreate, db: Session = Depends(get_db)):
         user_response = UserResponse.from_orm(db_user)
 
         # Cache the user in Redis as a JSON string
-        redis_client.set(f"user:{db_user.id}", user_response.json())
+        redis_client.set(f"user:{db_user.id}", user_response.json(), ex=300)
 
         return user_response
     except Exception as e:
@@ -45,7 +45,7 @@ async def get_users(db: Session = Depends(get_db)):
             for user in users:
                 # Serialize User object to JSON using UserResponse model
                 user_response = UserResponse.from_orm(user)
-                redis_client.set(f"user:{user.id}", user_response.json())
+                redis_client.set(f"user:{user.id}", user_response.json(), ex=300)
             return users
         else:
             # Deserialize cached JSON back to UserResponse objects
