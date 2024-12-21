@@ -1,9 +1,10 @@
 .ONESHELL:
+
 up:
-	clear
+	cls
 	docker-compose up --build
 
 cleaned:
-	clear
+	cls
 	docker system prune -a -f
 	docker-compose up --build
