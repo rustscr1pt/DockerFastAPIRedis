@@ -9,9 +9,9 @@ from redis_manager import redis_client
 
 logging.basicConfig(level=logging.INFO)
 
-router = APIRouter()
+user_router = APIRouter()
 
-@router.post("/create_user", response_model=UserResponse)
+@user_router.post("/create_user", response_model=UserResponse)
 async def create_user(data: UserCreate, db: Session = Depends(get_db)):
     try:
         # Create and save the user in the database
@@ -31,7 +31,7 @@ async def create_user(data: UserCreate, db: Session = Depends(get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/get_users", response_model=list[UserResponse])
+@user_router.get("/get_users", response_model=list[UserResponse])
 async def get_users(db: Session = Depends(get_db)):
     try:
         # Attempt to get users from Redis
@@ -53,7 +53,9 @@ async def get_users(db: Session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.get("/check_cache")
+
+
+@user_router.get("/check_cache")
 async def check_cache():
     try:
         keys = redis_client.keys("*")  # Get all keys in Redis
