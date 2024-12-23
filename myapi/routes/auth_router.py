@@ -7,9 +7,8 @@ from redis_manager import redis_client
 
 auth_router = APIRouter()
 
-@auth_router.get(
-    "/login",
-
+@auth_router.post(
+    "/login"
 )
 async def login(data : UserCreate, db: Session = Depends(get_db)):
     try:
@@ -21,8 +20,10 @@ async def login(data : UserCreate, db: Session = Depends(get_db)):
                 return
             else:
                 raise HTTPException(status_code=401, detail="Incorrect password")
-        db_user = db.query(User).filter(User.username == data.username).first()
+        db_user = db.query(User).filter(User.name == data.username).first()
         if not db_user:
             raise HTTPException(status_code=404, detail="User not found")
         if db_user.password != data.password:
             raise HTTPException(status_code=401, detail="Incorrect password")
+
+        redis_client
