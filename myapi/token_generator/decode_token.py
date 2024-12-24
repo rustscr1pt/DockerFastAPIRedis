@@ -1,12 +1,14 @@
 import datetime
 import jwt
+from fastapi.security import HTTPAuthorizationCredentials
+
 from exception import TokenExpired
 
 
-def decode_jwt(token: str) -> dict:
+def decode_jwt(token: HTTPAuthorizationCredentials) -> dict:
     try:
         payload = jwt.decode(
-            jwt=token,
+            jwt=token.credentials,
             key='secret',
             algorithms=['HS256']
         )
