@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from alchemy_models import get_db, User
-from entities import UserCreate, UserResponse
+from entities import UserCreate, UserResponse, Reply
 from redis_manager import redis_client
 from token_generator import decode_jwt
 
@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 auth_scheme = HTTPBearer()
 user_router = APIRouter()
 
-@user_router.post("/create_user", response_model=UserResponse)
+@user_router.post("/create_user", response_model=Reply)
 async def create_user(data: UserCreate, db: Session = Depends(get_db)) -> UserResponse:
     """
     Creates a new user and stores it in the database. The user is also cached in Redis for quick access.
@@ -47,12 +47,12 @@ async def create_user(data: UserCreate, db: Session = Depends(get_db)) -> UserRe
         db.refresh(db_user)
         user_response = UserResponse.from_orm(db_user)
         redis_client.set(f"user:{db_user.id}", user_response.json(), ex=300)
-        return user_response
+        return Reply(message=user_response)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@user_router.get("/get_users", response_model=list[UserResponse])
+@user_router.get("/get_users", response_model=Reply)
 async def get_users(
         db: Session = Depends(get_db),
         credentials: HTTPAuthorizationCredentials = Depends(auth_scheme)
@@ -89,8 +89,8 @@ async def get_users(
             for user in users:
                 user_response = UserResponse.from_orm(user)
                 redis_client.set(f"user:{user.id}", user_response.json(), ex=300)
-            return users
+            return Reply(message=users)
         else:
-            return [UserResponse.parse_raw(user) for user in cached_users]
+            return Reply(message=[UserResponse.parse_raw(user) for user in cached_users])
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

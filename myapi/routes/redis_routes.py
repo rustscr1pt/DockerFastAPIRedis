@@ -1,12 +1,16 @@
 import logging
 from fastapi import APIRouter, HTTPException
+from entities import Reply
 from redis_manager import redis_client
 
 logging.basicConfig(level=logging.INFO)
 
 redis_router = APIRouter()
 
-@redis_router.get("/check_cache")
+@redis_router.get(
+    "/check_cache",
+    response_model=Reply
+)
 async def check_cache() -> dict:
     """
     Retrieves and logs all the keys currently stored in Redis. This route is useful for debugging
@@ -39,7 +43,7 @@ async def check_cache() -> dict:
     try:
         keys = redis_client.keys("*")  # Get all keys in Redis
         logging.info(f"Redis Keys: {keys}")
-        return {"keys": keys}
+        return Reply(message={"keys": keys})
     except Exception as e:
         logging.error(f"Error checking Redis: {e}")
         raise HTTPException(status_code=500, detail="Error checking Redis")
