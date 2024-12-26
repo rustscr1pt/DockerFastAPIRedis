@@ -1,12 +1,13 @@
 from fastapi import FastAPI
-from alchemy_models import initialize_database, create_tables
-from routes import auth_router
-from routes import user_router, redis_router
-from redis_manager import check_redis_connection
+from controller import engine, redis_client, Base
+from controller.alchemy_controller import initialize_database, create_tables
+from view.routes import auth_router
+from view.routes import user_router, redis_router
+from controller.redis_manager import check_redis_connection
 
-initialize_database()
-check_redis_connection()
-create_tables()
+initialize_database(engine=engine)
+check_redis_connection(redis_client=redis_client)
+create_tables(engine=engine, Base=Base)
 app = FastAPI()
 
 app.include_router(user_router, prefix="/api", tags=["Users"])

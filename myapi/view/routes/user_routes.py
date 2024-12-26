@@ -2,10 +2,11 @@ import logging
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
-from alchemy_models import get_db, User
-from entities import UserCreate, UserResponse, Reply
-from redis_manager import redis_client
-from token_generator import decode_jwt
+from controller.alchemy_controller import get_db
+from model.alchemy_entities import User
+from model.entities import UserCreate, UserResponse, Reply
+from controller.redis_manager import redis_client
+from controller.token_generator import decode_jwt
 
 logging.basicConfig(level=logging.INFO)
 

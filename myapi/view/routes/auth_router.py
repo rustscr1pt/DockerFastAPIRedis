@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
-from entities import UserCreate
+
+from model import User
+from model.entities import UserCreate
 from sqlalchemy.orm import Session
-from alchemy_models import get_db, User
-from redis_manager import redis_client
-from entities import Reply
-from token_generator import encode_jwt
+from controller.alchemy_controller import get_db
+from controller.redis_manager import redis_client
+from model.entities import Reply
+from controller.token_generator import encode_jwt
 
 auth_router = APIRouter()
 

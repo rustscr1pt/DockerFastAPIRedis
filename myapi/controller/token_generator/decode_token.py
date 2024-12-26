@@ -2,7 +2,7 @@ import datetime
 import jwt
 from fastapi.security import HTTPAuthorizationCredentials
 
-from exception import TokenExpired
+from model.entities.exception import TokenExpired
 
 
 def decode_jwt(token: HTTPAuthorizationCredentials) -> dict:

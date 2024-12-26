@@ -1,6 +1,6 @@
 # Define the User model
 from sqlalchemy import Column, String, Integer, DateTime, func
-from .models import Base
+from controller.alchemy_controller.main import Base
 
 
 class User(Base):

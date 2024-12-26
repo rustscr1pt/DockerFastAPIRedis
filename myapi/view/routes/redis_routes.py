@@ -1,7 +1,7 @@
 import logging
 from fastapi import APIRouter, HTTPException
-from entities import Reply
-from redis_manager import redis_client
+from model.entities import Reply
+from controller.redis_manager import redis_client
 
 logging.basicConfig(level=logging.INFO)
 
