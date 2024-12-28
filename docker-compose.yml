@@ -43,6 +43,38 @@ services:
     networks:
       - combined-network
 
+  celery_worker:
+    build: ./myapi
+    command: celery -A celery_base worker --loglevel=info
+    container_name: celery_worker
+    depends_on:
+      - redis
+      - myapi
+    networks:
+      - combined-network
+
+  celery_beat:
+    build: ./myapi
+    command: celery -A celery_base beat --loglevel=info
+    container_name: celery_beat
+    depends_on:
+      - redis
+      - myapi
+    networks:
+      - combined-network
+
+  flower:
+    build: ./myapi
+    command: celery -A celery_base flower --port=5555
+    container_name: flower
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+      - myapi
+    networks:
+      - combined-network
+
 networks:
   combined-network:
     driver: bridge
