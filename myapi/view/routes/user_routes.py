@@ -7,6 +7,7 @@ from model.alchemy_entities import User
 from model.entities import UserCreate, UserResponse, Reply
 from controller.redis_manager import redis_client
 from controller.token_generator import decode_jwt
+from controller.celery_controller.tasks import cache_user_in_redis, fetch_users_from_db
 
 logging.basicConfig(level=logging.INFO)
 
@@ -47,7 +48,9 @@ async def create_user(data: UserCreate, db: Session = Depends(get_db)) -> UserRe
         db.commit()
         db.refresh(db_user)
         user_response = UserResponse.from_orm(db_user)
-        redis_client.set(f"user:{db_user.id}", user_response.json(), ex=300)
+
+        cache_user_in_redis.delay(db_user.id)
+
         return Reply(message=user_response)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -83,13 +86,13 @@ async def get_users(
     """
     try:
         decode_jwt(credentials)
+
         user_ids = redis_client.keys("user:*")
         cached_users = [redis_client.get(user_id) for user_id in user_ids]
+
         if not cached_users:
-            users = db.query(User).all()
-            for user in users:
-                user_response = UserResponse.from_orm(user)
-                redis_client.set(f"user:{user.id}", user_response.json(), ex=300)
+            task = fetch_users_from_db.delay()
+            users = task.get()
             return Reply(message=users)
         else:
             return Reply(message=[UserResponse.parse_raw(user) for user in cached_users])
