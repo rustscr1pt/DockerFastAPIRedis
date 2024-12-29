@@ -1,4 +1,4 @@
-from celery_base import app
+from controller.celery_controller.celery_base import app
 
 @app.task
 def add(x, y):
