@@ -15,6 +15,7 @@ def cache_user_in_redis(user_id: int):
         user_response = UserResponse.from_orm(user)
         redis_client.set(f"user:{user_id}", user_response.json(), ex=300)
 
+
 @shared_task
 def fetch_users_from_db():
     """

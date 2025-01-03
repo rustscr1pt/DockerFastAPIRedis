@@ -7,10 +7,8 @@ logging.basicConfig(level=logging.INFO)
 
 redis_router = APIRouter()
 
-@redis_router.get(
-    "/check_cache",
-    response_model=Reply
-)
+
+@redis_router.get("/check_cache", response_model=Reply)
 async def check_cache() -> dict:
     """
     Retrieves and logs all the keys currently stored in Redis. This route is useful for debugging

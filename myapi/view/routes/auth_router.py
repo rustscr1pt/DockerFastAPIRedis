@@ -10,6 +10,7 @@ from controller.token_generator import encode_jwt
 
 auth_router = APIRouter()
 
+
 @auth_router.post("/login", response_model=Reply)
 async def login(data: UserCreate, db: Session = Depends(get_db)) -> Reply:
     """
@@ -47,8 +48,8 @@ async def login(data: UserCreate, db: Session = Depends(get_db)) -> Reply:
         redis_key = f"user:{data.name}"
         cached_user = redis_client.hgetall(redis_key)
         if cached_user:
-            cached_password = cached_user.get(b"password").decode('utf-8')
-            cached_id = cached_user.get(b"id").decode('utf-8')
+            cached_password = cached_user.get(b"password").decode("utf-8")
+            cached_id = cached_user.get(b"id").decode("utf-8")
             if cached_password == data.password:
                 return Reply(message=encode_jwt(cached_id))
             else:

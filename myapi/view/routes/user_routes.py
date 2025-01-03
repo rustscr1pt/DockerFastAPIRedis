@@ -14,6 +14,7 @@ logging.basicConfig(level=logging.INFO)
 auth_scheme = HTTPBearer()
 user_router = APIRouter()
 
+
 @user_router.post("/create_user", response_model=Reply)
 async def create_user(data: UserCreate, db: Session = Depends(get_db)) -> UserResponse:
     """
@@ -58,8 +59,8 @@ async def create_user(data: UserCreate, db: Session = Depends(get_db)) -> UserRe
 
 @user_router.get("/get_users", response_model=Reply)
 async def get_users(
-        db: Session = Depends(get_db),
-        credentials: HTTPAuthorizationCredentials = Depends(auth_scheme)
+    db: Session = Depends(get_db),
+    credentials: HTTPAuthorizationCredentials = Depends(auth_scheme),
 ) -> list[UserResponse]:
     """
     Retrieves a list of users. First, it checks Redis for cached users, and if not found, it fetches them from the database.
@@ -95,6 +96,8 @@ async def get_users(
             users = task.get()
             return Reply(message=users)
         else:
-            return Reply(message=[UserResponse.parse_raw(user) for user in cached_users])
+            return Reply(
+                message=[UserResponse.parse_raw(user) for user in cached_users]
+            )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
