@@ -9,6 +9,8 @@ on:
 jobs:
   formatter:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Grant write permissions to the GITHUB_TOKEN
     steps:
       # Check out the repository
       - name: Checkout code
