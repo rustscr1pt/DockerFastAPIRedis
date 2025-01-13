@@ -27,3 +27,5 @@ def fetch_users_from_db():
         user_response = UserResponse.from_orm(user)
         redis_client.set(f"user:{user.id}", user_response.json(), ex=300)
     return [user_response.dict() for user in users]
+
+
